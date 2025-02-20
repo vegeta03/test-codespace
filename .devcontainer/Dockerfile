@@ -20,8 +20,8 @@ RUN curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64 \
     && chmod +x ./kind \
     && mv ./kind /usr/local/bin/kind
 
-# Configure PostgreSQL directories
-RUN mkdir -p /var/lib/pgsql/data/log \
+# Configure PostgreSQL base directory (without creating data subdirectory)
+RUN mkdir -p /var/lib/pgsql \
     && chown -R postgres:postgres /var/lib/pgsql
 
 # Create password file before switching users
@@ -38,7 +38,8 @@ RUN initdb -D /var/lib/pgsql/data \
     --username=postgres \
     --pwfile=/tmp/pgpass \
     && echo "host all all all scram-sha-256" >> /var/lib/pgsql/data/pg_hba.conf \
-    && echo "listen_addresses = '*'" >> /var/lib/pgsql/data/postgresql.conf
+    && echo "listen_addresses = '*'" >> /var/lib/pgsql/data/postgresql.conf \
+    && mkdir -p /var/lib/pgsql/data/log  # Create log dir after initdb
 
 # Configure container user
 USER root
