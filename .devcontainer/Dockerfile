@@ -16,16 +16,12 @@ RUN dnf install -y \
 ENV GOPATH=/go
 ENV PATH=$PATH:/usr/local/go/bin:/go/bin
 
-# Install required tools and dependencies
-RUN dnf update -y && \
-dnf install -y wget tar git podman curl && \
-dnf clean all
-
 # Install Kind
 RUN curl -Lo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64 \
     && chmod +x /usr/local/bin/kind
 
-# Set the working directory for development
+# Create workspace and set permissions
+RUN mkdir /workspace && chmod 777 /workspace
 WORKDIR /workspace
 
 # Expose any ports if necessary (e.g. for Go webservers)

@@ -8,5 +8,14 @@
         8080,
         5432
     ],
-    "postCreateCommand": "echo 'Development environment is ready!'"
+    "postCreateCommand": "echo 'Waiting for PostgreSQL...' && while ! nc -z postgres_db 5432; do sleep 1; done && echo 'Environment ready!'",
+    "remoteUser": "root",
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "golang.go",
+                "redhat.podman"
+            ]
+        }
+    }
 }
