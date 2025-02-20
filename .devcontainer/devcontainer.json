@@ -1,7 +1,10 @@
 {
     "name": "Fedora DevContainer",
     "build": {
-        "dockerfile": "Dockerfile"
+        "dockerfile": "Dockerfile",
+        "args": {
+            "POSTGRES_PASSWORD": "devpass"
+        }
     },
     "customizations": {
         "vscode": {
@@ -16,11 +19,11 @@
         5432,
         8080
     ],
-    "postCreateCommand": "sudo -u postgres pg_ctl start -D /var/lib/pgsql/data -t 60 && kind create cluster",
+    "postCreateCommand": "sudo -u postgres pg_ctl start -D /var/lib/pgsql/data && kind create cluster",
     "remoteUser": "vscode",
     "containerEnv": {
         "KIND_EXPERIMENTAL_PROVIDER": "podman",
         "PGDATA": "/var/lib/pgsql/data",
-        "PGLOG": "/var/lib/pgsql/data/log/postgresql.log"
+        "POSTGRES_PASSWORD": "devpass"
     }
 }
