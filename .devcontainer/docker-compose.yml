@@ -8,8 +8,6 @@ services:
     container_name: dev_container
     volumes:
       - .:/workspace:cached
-    # Additional run arguments may be added here
-    # Forward any development ports if necessary
     ports:
       - "8080:8080"
   

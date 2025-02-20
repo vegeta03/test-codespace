@@ -30,3 +30,6 @@ WORKDIR /workspace
 
 # Expose any ports if necessary (e.g. for Go webservers)
 EXPOSE 8080
+
+# Keep container running
+CMD ["tail", "-f", "/dev/null"]
