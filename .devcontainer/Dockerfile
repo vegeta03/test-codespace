@@ -1,3 +1,4 @@
+# .devcontainer/Dockerfile
 FROM fedora:42
 
 # Install core packages
@@ -11,7 +12,7 @@ RUN dnf install -y \
     sudo \
     && dnf clean all
 
-# Configure Go
+# Configure Go environment
 ENV GOPATH=/go PATH=$PATH:/usr/local/go/bin:/go/bin
 
 # Install Kind
@@ -19,16 +20,25 @@ RUN curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64 \
     && chmod +x ./kind \
     && mv ./kind /usr/local/bin/kind
 
-# PostgreSQL Manual Setup
-RUN mkdir -p /var/lib/pgsql/data \
+# Configure PostgreSQL directories
+RUN mkdir -p /var/lib/pgsql/data/log \
     && chown -R postgres:postgres /var/lib/pgsql \
-    && sudo -u postgres initdb -D /var/lib/pgsql/data --auth-host=scram-sha-256 \
+    && chmod 0700 /var/lib/pgsql/data
+
+# Initialize DB as postgres user
+USER postgres
+RUN initdb -D /var/lib/pgsql/data \
+    --auth-host=scram-sha-256 \
+    --auth-local=scram-sha-256 \
     && echo "host all all all scram-sha-256" >> /var/lib/pgsql/data/pg_hba.conf \
     && echo "listen_addresses = '*'" >> /var/lib/pgsql/data/postgresql.conf
 
 # Configure container user
+USER root
 RUN useradd -m vscode \
     && usermod -aG wheel vscode \
-    && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
+    && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
+    && chown -R vscode:vscode /workspace
 
 USER vscode
+WORKDIR /workspace
