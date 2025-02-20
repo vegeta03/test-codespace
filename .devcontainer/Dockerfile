@@ -24,12 +24,17 @@ RUN curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64 \
 RUN mkdir -p /var/lib/pgsql/data/log \
     && chown -R postgres:postgres /var/lib/pgsql
 
+# Create password file before switching users
+ARG POSTGRES_PASSWORD
+RUN echo "${POSTGRES_PASSWORD}" > /tmp/pgpass \
+    && chmod 600 /tmp/pgpass \
+    && chown postgres:postgres /tmp/pgpass
+
 # Initialize DB as postgres user
 USER postgres
 RUN initdb -D /var/lib/pgsql/data \
     --auth-host=scram-sha-256 \
     --auth-local=scram-sha-256 \
-    --pgdata=/var/lib/pgsql/data \
     --username=postgres \
     --pwfile=/tmp/pgpass \
     && echo "host all all all scram-sha-256" >> /var/lib/pgsql/data/pg_hba.conf \
