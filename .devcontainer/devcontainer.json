@@ -6,6 +6,12 @@
             "POSTGRES_PASSWORD": "devpass"
         }
     },
+    "remoteUser": "vscode",
+    "containerEnv": {
+        "KIND_EXPERIMENTAL_PROVIDER": "podman",
+        "PGDATA": "/var/lib/pgsql/data",
+        "POSTGRES_PASSWORD": "devpass"
+    },
     "customizations": {
         "vscode": {
             "extensions": [
@@ -19,11 +25,8 @@
         5432,
         8080
     ],
-    "postCreateCommand": "sudo -E -u postgres bash -c 'chmod 700 $PGDATA && rm -f $PGDATA/postmaster.pid && pg_ctl start -D $PGDATA -l $PGDATA/log/postgres.log -w -t 60' && kind create cluster",
-    "remoteUser": "vscode",
-    "containerEnv": {
-        "KIND_EXPERIMENTAL_PROVIDER": "podman",
-        "PGDATA": "/var/lib/pgsql/data",
-        "POSTGRES_PASSWORD": "devpass"
-    }
+    "postCreateCommand": [
+        "sudo systemctl start postgresql",
+        "kind create cluster"
+    ]
 }
