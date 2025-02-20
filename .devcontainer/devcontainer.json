@@ -19,7 +19,7 @@
         5432,
         8080
     ],
-    "postCreateCommand": "sudo -u postgres pg_ctl start -D /var/lib/pgsql/data && kind create cluster",
+    "postCreateCommand": "sudo -u postgres pg_ctl start -D /var/lib/pgsql/data -l /var/lib/pgsql/data/log/postgres.log -w -t 60 && kind create cluster",
     "remoteUser": "vscode",
     "containerEnv": {
         "KIND_EXPERIMENTAL_PROVIDER": "podman",

@@ -12,25 +12,25 @@ RUN dnf install -y \
     sudo \
     && dnf clean all
 
-# Set environment for Go
+# Set Go environment
 ENV GOPATH=/go PATH=$PATH:/usr/local/go/bin:/go/bin
 
-# Install Kind for Kubernetes cluster creation
+# Install Kind for Kubernetes clustering
 RUN curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64 \
     && chmod +x ./kind \
     && mv ./kind /usr/local/bin/kind
 
-# Configure PostgreSQL base directory; do not pre-create the data directory
+# Create PostgreSQL base directory and adjust ownership
 RUN mkdir -p /var/lib/pgsql \
     && chown -R postgres:postgres /var/lib/pgsql
 
-# Create password file with build argument; ensure proper permissions
+# Create a password file using build argument; secure it properly
 ARG POSTGRES_PASSWORD
 RUN echo "${POSTGRES_PASSWORD}" > /tmp/pgpass \
     && chmod 600 /tmp/pgpass \
     && chown postgres:postgres /tmp/pgpass
 
-# Switch to postgres user to initialize the database cluster
+# Switch to postgres user to initialize the database
 USER postgres
 RUN initdb -D /var/lib/pgsql/data \
     --auth-host=scram-sha-256 \
@@ -39,18 +39,21 @@ RUN initdb -D /var/lib/pgsql/data \
     --pwfile=/tmp/pgpass \
     && echo "host all all all scram-sha-256" >> /var/lib/pgsql/data/pg_hba.conf \
     && echo "listen_addresses = '*'" >> /var/lib/pgsql/data/postgresql.conf \
-    && mkdir -p /var/lib/pgsql/data/log  # Create log directory after initdb
+    && mkdir -p /var/lib/pgsql/data/log
 
-# Switch back to root for user configuration and workspace setup
+# (Optional) Set PGDATA environment variable for clarity
+ENV PGDATA=/var/lib/pgsql/data
+
+# Switch back to root for further configuration
 USER root
 
-# Create the /workspace directory before attempting to change its ownership.
+# Ensure /workspace exists before changing its ownership
 RUN mkdir -p /workspace \
     && useradd -m vscode \
     && usermod -aG wheel vscode \
     && echo '%wheel ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers \
     && chown -R vscode:vscode /workspace
 
-# Set the default user and working directory
+# Set final user and working directory
 USER vscode
 WORKDIR /workspace
