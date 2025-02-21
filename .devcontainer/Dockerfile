@@ -43,7 +43,6 @@ ENV GOBIN=/usr/local/bin
 # This installs Podman at the expected version via Homebrew.
 RUN brew install podman
 
-
 # Install Kind using go install
 RUN go install sigs.k8s.io/kind@v0.27.0
 
