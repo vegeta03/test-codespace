@@ -8,8 +8,14 @@
         "source=/,target=/,type=bind,bind-propagation=rshared"
     ],
     "runArgs": [
+        "--privileged",
         "--cap-add=SYS_ADMIN",
-        "--security-opt", "apparmor:unconfined"
+        "--security-opt",
+        "apparmor:unconfined",
+        "--device",
+        "/dev/fuse",
+        "--device",
+        "/dev/net/tun"
     ],
     "customizations": {
         "vscode": {
