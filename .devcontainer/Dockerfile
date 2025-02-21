@@ -9,39 +9,44 @@ RUN apt-get update && apt-get install -y \
     ca-certificates \
     build-essential \
     gnupg \
-    lsb-release && \
-    rm -rf /var/lib/apt/lists/*
+    lsb-release \
+ && rm -rf /var/lib/apt/lists/*
 
 # -------------------------------
-# Install Go 1.24
+# Install Homebrew on Linux
 # -------------------------------
-RUN wget https://go.dev/dl/go1.24.0.linux-amd64.tar.gz && \
-    rm -rf /usr/local/go && \
-    tar -C /usr/local -xzf go1.24.0.linux-amd64.tar.gz && \
-    rm go1.24.0.linux-amd64.tar.gz
-# Update PATH to include Go
-ENV PATH="/usr/local/go/bin:${PATH}"
+# Set environment variables to run the installer noninteractively as root.
+ENV NONINTERACTIVE=1
+ENV HOMEBREW_INSTALL_AS_ROOT=1
+
+RUN /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+
+# Add Homebrew directories to PATH (default locations on Linux)
+ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}"
 
 # -------------------------------
-# Setup Go environment for installing Kind
+# Install Go 1.24 using Homebrew
 # -------------------------------
+# Using the formula go@1.24 ensures the precise version is installed.
+RUN brew install go@1.24
+
+# Since go@1.24 is keg-only, prepend its opt path to ensure the go binary is found.
+ENV PATH="/home/linuxbrew/.linuxbrew/opt/go@1.24/bin:${PATH}"
+
 # Set GOPATH and GOBIN so that go install places binaries in /usr/local/bin.
 ENV GOPATH=/go
 ENV GOBIN=/usr/local/bin
 
 # -------------------------------
-# Install Podman 5.4.0
+# Install Podman 5.4.0 using Homebrew
 # -------------------------------
-# (For demonstration, we assume a release archive is available at the URL below)
-RUN wget https://github.com/containers/podman/releases/download/v5.4.0/podman-remote-static-linux_amd64.tar.gz && \
-    tar -xzvf podman-remote-static-linux_amd64.tar.gz -C /usr/local/bin --strip-components=1 && \
-    rm podman-remote-static-linux_amd64.tar.gz
-
+# This installs Podman at the expected version via Homebrew.
+RUN brew install podman
 
 # Install Kind using go install
 RUN go install sigs.k8s.io/kind@v0.27.0
 
 # (Optional) Verify installations during build if desired:
-# RUN go version && podman --version && kind version
+RUN go version && podman --version && kind version
 
 # The default command of the base postgres image will start the Postgres server
