@@ -49,7 +49,7 @@ RUN brew install podman
 RUN chmod 4755 /usr/bin/newuidmap /usr/bin/newgidmap
 
 # -------------------------------
-# Install Kind using go install
+# Install Kind using `go install`
 # -------------------------------
 RUN go install sigs.k8s.io/kind@v0.27.0
 
