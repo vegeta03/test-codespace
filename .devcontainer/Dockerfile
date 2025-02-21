@@ -1,7 +1,7 @@
 # Use the official PostgreSQL image based on Debian Bookworm
 FROM postgres:17.3-bookworm
 
-# Install prerequisites and build tools
+# Install prerequisites and build tools including uidmap for newuidmap/newgidmap
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     gnupg \
     lsb-release \
+    uidmap \
  && rm -rf /var/lib/apt/lists/*
 
 # -------------------------------
@@ -40,13 +41,16 @@ ENV GOBIN=/usr/local/bin
 # -------------------------------
 # Install Podman 5.4.0 using Homebrew
 # -------------------------------
-# This installs Podman at the expected version via Homebrew.
 RUN brew install podman
+# Ensure newuidmap and newgidmap have their setuid bits set so rootless operations work
+RUN chmod 4755 /usr/bin/newuidmap /usr/bin/newgidmap
 
+# -------------------------------
 # Install Kind using go install
+# -------------------------------
 RUN go install sigs.k8s.io/kind@v0.27.0
 
-# (Optional) Verify installations during build if desired:
+# (Optional) You can verify installations during build:
 # RUN go version && podman --version && kind version
 
 # The default command of the base postgres image will start the Postgres server
