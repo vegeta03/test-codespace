@@ -3,6 +3,7 @@ FROM postgres:17.3-bookworm
 
 # Install prerequisites and build tools including uidmap for newuidmap/newgidmap
 RUN apt-get update && apt-get install -y \
+    sudo \
     curl \
     wget \
     git \
