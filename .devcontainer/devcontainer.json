@@ -17,11 +17,5 @@
     },
     "postCreateCommand": "go version && podman --version && kind version",
     "workspaceFolder": "/workspaces/test-codespace",
-    "remoteUser": "postgres",
-    "features": {
-        "ghcr.io/devcontainers/features/docker-existing-docker-compose:1": {
-            "version": "latest",
-            "dockerComposeFile": "docker-compose.yml"
-        }
-    }
+    "remoteUser": "postgres"
 }

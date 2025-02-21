@@ -10,7 +10,6 @@ RUN apt-get update && apt-get install -y \
     build-essential \
     gnupg \
     lsb-release \
-    uidmap \
  && rm -rf /var/lib/apt/lists/*
 
 # -------------------------------
@@ -34,7 +33,7 @@ RUN brew install go@1.24
 # Since go@1.24 is keg-only, prepend its opt path to ensure the go binary is found.
 ENV PATH="/home/linuxbrew/.linuxbrew/opt/go@1.24/bin:${PATH}"
 
-# Setup Go environment for installing Kind
+# Set GOPATH and GOBIN so that go install places binaries in /usr/local/bin.
 ENV GOPATH=/go
 ENV GOBIN=/usr/local/bin
 
@@ -44,13 +43,11 @@ ENV GOBIN=/usr/local/bin
 # This installs Podman at the expected version via Homebrew.
 RUN brew install podman
 
+
 # Install Kind using go install
 RUN go install sigs.k8s.io/kind@v0.27.0
 
-# Configure Podman for rootless execution within the container
-RUN podman system service --time=0 &
-
 # (Optional) Verify installations during build if desired:
-RUN go version && kind version
+# RUN go version && podman --version && kind version
 
-# The default command of the base postgres image will start the PostgreSQL server
+# The default command of the base postgres image will start the Postgres server
