@@ -53,7 +53,4 @@ RUN chmod 4755 /usr/bin/newuidmap /usr/bin/newgidmap
 # -------------------------------
 RUN go install sigs.k8s.io/kind@v0.27.0
 
-# (Optional) Verify installations during build:
-# RUN go version && podman --version && kind version
-
 # The default command of the base postgres image will start the Postgres server.
