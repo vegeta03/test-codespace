@@ -16,6 +16,6 @@
         }
     },
     "postCreateCommand": "go version && podman --version && kind version",
-    "workspaceFolder": "/workspace",
+    "workspaceFolder": "/workspace/test-codespace",
     "remoteUser": "postgres"
 }
