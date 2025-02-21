@@ -14,6 +14,10 @@ RUN apt-get update && apt-get install -y \
     uidmap \
  && rm -rf /var/lib/apt/lists/*
 
+# Configure passwordless sudo for postgres to avoid password prompts
+RUN echo "postgres ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/90-postgres && \
+    chmod 0440 /etc/sudoers.d/90-postgres
+
 # -------------------------------
 # Install Homebrew on Linux
 # -------------------------------
@@ -31,10 +35,8 @@ ENV PATH="/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin:${PATH}
 # -------------------------------
 # Using the formula go@1.24 ensures the precise version is installed.
 RUN brew install go@1.24
-
 # Since go@1.24 is keg-only, prepend its opt path to ensure the go binary is found.
 ENV PATH="/home/linuxbrew/.linuxbrew/opt/go@1.24/bin:${PATH}"
-
 # Set GOPATH and GOBIN so that go install places binaries in /usr/local/bin.
 ENV GOPATH=/go
 ENV GOBIN=/usr/local/bin
@@ -43,7 +45,7 @@ ENV GOBIN=/usr/local/bin
 # Install Podman 5.4.0 using Homebrew
 # -------------------------------
 RUN brew install podman
-# Ensure newuidmap and newgidmap have their setuid bits set so rootless operations work
+# Ensure newuidmap and newgidmap have their setuid bits set so that rootless operations work.
 RUN chmod 4755 /usr/bin/newuidmap /usr/bin/newgidmap
 
 # -------------------------------
@@ -51,7 +53,7 @@ RUN chmod 4755 /usr/bin/newuidmap /usr/bin/newgidmap
 # -------------------------------
 RUN go install sigs.k8s.io/kind@v0.27.0
 
-# (Optional) You can verify installations during build:
+# (Optional) Verify installations during build:
 # RUN go version && podman --version && kind version
 
-# The default command of the base postgres image will start the Postgres server
+# The default command of the base postgres image will start the Postgres server.
