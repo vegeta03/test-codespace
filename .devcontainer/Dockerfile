@@ -1,31 +1,46 @@
-FROM fedora:42
+# Use the official PostgreSQL image based on Debian Bookworm
+FROM postgres:17.3-bookworm
 
-RUN dnf install -y \
-    wget \
+# Install prerequisites and build tools
+RUN apt-get update && apt-get install -y \
     curl \
-    tar \
-    make \
-    gcc \
-    sudo \
+    wget \
     git \
-    golang \
-    podman \
-    && dnf clean all
+    ca-certificates \
+    build-essential \
+    gnupg \
+    lsb-release && \
+    rm -rf /var/lib/apt/lists/*
 
-# Set up Go environment
+# -------------------------------
+# Install Go 1.24
+# -------------------------------
+RUN wget https://go.dev/dl/go1.24.linux-amd64.tar.gz && \
+    rm -rf /usr/local/go && \
+    tar -C /usr/local -xzf go1.24.linux-amd64.tar.gz && \
+    rm go1.24.linux-amd64.tar.gz
+# Update PATH to include Go
+ENV PATH="/usr/local/go/bin:${PATH}"
+
+# -------------------------------
+# Install Podman 5.4.0
+# -------------------------------
+# (For demonstration, we assume a release archive is available at the URL below)
+RUN wget https://github.com/containers/podman/releases/download/v5.4.0/podman-5.4.0-linux-x86_64.tar.gz && \
+    tar -xzvf podman-5.4.0-linux-x86_64.tar.gz -C /usr/local/bin --strip-components=1 && \
+    rm podman-5.4.0-linux-x86_64.tar.gz
+
+# -------------------------------
+# Setup Go environment for installing Kind
+# -------------------------------
+# Set GOPATH and GOBIN so that go install places binaries in /usr/local/bin.
 ENV GOPATH=/go
-ENV PATH=$PATH:/usr/local/go/bin:/go/bin
+ENV GOBIN=/usr/local/bin
 
-# Install Kind
-RUN curl -Lo /usr/local/bin/kind https://kind.sigs.k8s.io/dl/v0.27.0/kind-linux-amd64 \
-    && chmod +x /usr/local/bin/kind
+# Install Kind using go install
+RUN go install sigs.k8s.io/kind@v0.27.0
 
-# Create workspace and set permissions
-RUN mkdir /workspace && chmod 777 /workspace
-WORKDIR /workspace
+# (Optional) Verify installations during build if desired:
+# RUN go version && podman --version && kind version
 
-# Expose any ports if necessary (e.g. for Go webservers)
-EXPOSE 8080
-
-# Keep container running
-CMD ["tail", "-f", "/dev/null"]
+# The default command of the base postgres image will start the Postgres server

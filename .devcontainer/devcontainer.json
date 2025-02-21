@@ -1,21 +1,21 @@
 {
-    "name": "Fedora Go, Podman, Kind, PostgreSQL 17.3 Dev Environment",
-    "dockerComposeFile": "docker-compose.yml",
-    "service": "dev",
-    "workspaceFolder": "/workspace",
-    "shutdownAction": "stopCompose",
-    "forwardPorts": [
-        8080,
-        5432
-    ],
-    "postCreateCommand": "echo 'Waiting for PostgreSQL...' && while ! nc -z postgres_db 5432; do sleep 1; done && echo 'Environment ready!'",
-    "remoteUser": "root",
+    "name": "Postgres DevContainer with Go, Podman, and Kind",
+    "build": {
+        "dockerfile": "Dockerfile",
+        "context": "."
+    },
     "customizations": {
         "vscode": {
+            "settings": {
+                "terminal.integrated.shell.linux": "/bin/bash"
+            },
             "extensions": [
                 "golang.go",
                 "redhat.podman"
             ]
         }
-    }
+    },
+    "postCreateCommand": "go version && podman --version && kind version",
+    "workspaceFolder": "/workspace",
+    "remoteUser": "postgres"
 }
