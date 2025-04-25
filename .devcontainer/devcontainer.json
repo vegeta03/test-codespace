@@ -1,34 +1,88 @@
 {
-    "name": "Postgres DevContainer with Go, Podman, and Kind",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "context": "."
+    "name": "Angular (pnpm+Nx) + Go Gin + Podman + Docker + GoNB + Playwright + Java + Conda",
+    // Use a universal base image that includes many common tools and supports features well.
+    "image": "mcr.microsoft.com/devcontainers/universal:2",
+    "features": {
+        // Node.js: Required for Angular, pnpm, Nx, Playwright. Installs Node LTS, npm, npx.
+        "ghcr.io/devcontainers/features/node:1": {
+            "version": "lts", // Or specify a fixed version like "20"
+            "nodeGypDependencies": true
+        },
+        // Go: Required for the Go Gin backend and GoNB kernel. Installs Go and sets up GOPATH.
+        "ghcr.io/devcontainers/features/go:1": {
+            "version": "latest" // Or specify a fixed version like "1.21"
+        },
+        // Docker-in-Docker: Provides Docker daemon access within the container. Essential for KinD.
+        "ghcr.io/devcontainers/features/docker-in-docker:2": {
+            "version": "latest",
+            "moby": true
+        },
+        // Podman: Installs Podman CLI.
+        "ghcr.io/devcontainers/features/podman:1": {
+            "version": "latest"
+        },
+        // KinD (Kubernetes in Docker): Installs KinD CLI for local Kubernetes clusters.
+        "ghcr.io/devcontainers/features/kind:1": {
+            "version": "latest"
+        },
+        // Kubectl, Helm, Kustomize: Installs essential Kubernetes tooling.
+        "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
+            "version": "latest",
+            "helm": "latest",
+            "kustomize": "latest"
+        },
+        // Java: Installs OpenJDK 24.
+        "ghcr.io/devcontainers/features/java:1": {
+            "version": "24",
+            "installMaven": "false",
+            "installGradle": "false"
+        },
+        // Miniconda: Installs Miniconda for Python/Jupyter environment management.
+        "ghcr.io/devcontainers/features/miniconda:1": {
+            "version": "latest"
+        }
     },
-    "mounts": [
-        "source=/,target=/,type=bind,bind-propagation=rshared"
+    // Forward ports for Angular dev server, Go backend, and Jupyter.
+    "forwardPorts": [
+        4200, // Default Angular serve port
+        8080, // Common Go HTTP server port
+        8888 // Default Jupyter port [1]
     ],
-    "runArgs": [
-        "--privileged",
-        "--cap-add=SYS_ADMIN",
-        "--security-opt",
-        "apparmor:unconfined",
-        "--device",
-        "/dev/fuse",
-        "--device",
-        "/dev/net/tun"
-    ],
+    // Updated commands to run after container creation.
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y --no-install-recommends && npm install -g pnpm && pnpm install -g @angular/cli nx && pnpm config set store-dir ~/.local/share/pnpm/store && conda update -n base -c defaults conda && conda install -y jupyterlab && go install golang.org/x/tools/cmd/goimports@latest && go install golang.org/x/tools/gopls@latest && go install github.com/janpfeifer/gonb@latest && gonb --install && npx playwright install --with-deps && if [ -d \\\"frontend\\\" ]; then cd frontend && pnpm install; cd ..; fi && if [ -d \\\"backend\\\" ]; then cd backend && go mod tidy; cd ..; fi && echo 'postCreateCommand finished.'",
+    // Configure VS Code settings and extensions within the codespace.
     "customizations": {
         "vscode": {
             "settings": {
-                "terminal.integrated.shell.linux": "/bin/bash"
+                "terminal.integrated.defaultProfile.linux": "bash",
+                // Point Python extension to Conda's Python environment
+                "python.defaultInterpreterPath": "/opt/conda/bin/python"
             },
             "extensions": [
+                // Essential Frontend
+                "angular.ng-template",
+                "nrwl.angular-console",
+                "esbenp.prettier-vscode",
+                "dbaeumer.vscode-eslint",
+                "firsttris.vscode-jest-runner",
+                // Essential Backend (Go)
                 "golang.go",
-                "redhat.podman"
+                // Containerization & K8s
+                "ms-azuretools.vscode-docker",
+                "ms-kubernetes-tools.vscode-kubernetes-tools",
+                // Java
+                "vscjava.vscode-java-pack",
+                // Python/Conda/Jupyter
+                "ms-python.python",
+                "ms-toolsai.jupyter", // Jupyter Notebook support
+                // Playwright Testing
+                "ms-playwright.playwright", // Playwright Test for VSCode
+                // General Development
+                "eamodio.gitlens",
+                "redhat.vscode-yaml"
             ]
         }
     },
-    "postCreateCommand": "sudo sh -c 'echo \"postgres:100000:65536\" >> /etc/subuid && echo \"postgres:100000:65536\" >> /etc/subgid' && podman system migrate && go version && psql --version && postgres --version && podman --version && kind version",
-    "workspaceFolder": "/workspaces/test-codespace",
-    "remoteUser": "postgres"
+    // Run as the default non-root user.
+    "remoteUser": "vscode"
 }
