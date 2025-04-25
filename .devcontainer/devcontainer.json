@@ -82,7 +82,5 @@
                 "redhat.vscode-yaml"
             ]
         }
-    },
-    // Run as the default non-root user.
-    "remoteUser": "vscode"
+    }
 }
