@@ -22,9 +22,9 @@
         //     "version": "latest"
         // },
         // KinD (Kubernetes in Docker): Installs KinD CLI for local Kubernetes clusters.
-        "ghcr.io/devcontainers/features/kind:1": {
-            "version": "latest"
-        },
+        // "ghcr.io/devcontainers/features/kind:1": {
+        //     "version": "latest"
+        // },
         // Kubectl, Helm, Kustomize: Installs essential Kubernetes tooling.
         "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
             "version": "latest",
