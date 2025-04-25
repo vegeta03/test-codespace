@@ -36,11 +36,11 @@
             "version": "24",
             "installMaven": "false",
             "installGradle": "false"
-        },
-        // Miniconda: Installs Miniconda for Python/Jupyter environment management.
-        "ghcr.io/devcontainers/features/miniconda:1": {
-            "version": "latest"
         }
+        // Miniconda: Installs Miniconda for Python/Jupyter environment management.
+        // "ghcr.io/devcontainers/features/miniconda:1": {
+        //     "version": "latest"
+        // }
     },
     // Forward ports for Angular dev server, Go backend, and Jupyter.
     "forwardPorts": [
