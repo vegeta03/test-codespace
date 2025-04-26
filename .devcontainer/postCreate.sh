@@ -14,19 +14,30 @@ export PATH=$(go env GOPATH)/bin:$PATH
 export PATH="$HOME/.cargo/bin:$PATH"
 
 # --- Install Core Tools (pnpm, Homebrew packages) ---
-echo "Updating Homebrew and installing basic tools..."
+echo "Updating Homebrew and installing basic tools (verbose)..."
 brew update
-brew install wget curl kustomize gradle terraform kubectl # Added kubectl
+# Added -v for verbose install
+brew install -v wget curl kustomize gradle terraform kubectl
+
+echo "Verifying kubectl installation..."
+# Use command -v and exit if not found
+if ! command -v kubectl &> /dev/null; then
+    echo "ERROR: kubectl command not found in PATH immediately after brew install."
+    echo "PATH was: $PATH"
+    exit 1
+fi
+echo "kubectl found at: $(command -v kubectl)"
 
 echo "Installing pnpm..."
 curl -fsSL https://get.pnpm.io/install.sh | bash -
-# Source the bashrc to get pnpm in the current session
-source ~/.bashrc
 # Explicitly set PNPM_HOME and update PATH for the current session
 export PNPM_HOME="$HOME/.local/share/pnpm"
 export PATH="$PNPM_HOME:$PATH"
 echo "PNPM_HOME is set to: $PNPM_HOME"
-echo "Updated PATH: $PATH"
+echo "Updated PATH for pnpm: $PATH"
+# Verify pnpm global bin location
+echo "pnpm expected global bin: $PNPM_HOME"
+echo "pnpm actual global bin: $(pnpm -g bin || echo 'Failed to get pnpm global bin')"
 
 echo "Configuring pnpm..."
 pnpm config set dangerouslyAllowAllBuilds true
@@ -36,15 +47,27 @@ echo "Installing global pnpm packages (@angular/cli, nx, playwright)..."
 # Moved this earlier and added playwright here
 pnpm install -g @angular/cli nx playwright
 
+echo "Verifying Angular CLI (ng) installation..."
+# Use command -v and exit if not found
+if ! command -v ng &> /dev/null; then
+    echo "ERROR: ng command not found in PATH immediately after pnpm install -g."
+    echo "PATH was: $PATH"
+    ls -la $PNPM_HOME || echo "Could not list $PNPM_HOME"
+    exit 1
+fi
+echo "ng found at: $(command -v ng)"
+
 # --- Install Miniconda & Jupyter ---
 echo "Installing Miniconda directly..."
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
 bash /tmp/miniconda.sh -b -p $HOME/miniconda
 rm /tmp/miniconda.sh
 
-echo "Initializing conda..."
-eval "$($HOME/miniconda/bin/conda shell.bash hook)"
-$HOME/miniconda/bin/conda init bash
+echo "Initializing conda (temporarily disabled PATH modifications for debugging)..."
+# TEMPORARILY COMMENTED OUT FOR DEBUGGING PATH ISSUES
+# eval "$($HOME/miniconda/bin/conda shell.bash hook)"
+# $HOME/miniconda/bin/conda init bash
+echo "Skipping conda shell hook and init for PATH debugging."
 $HOME/miniconda/bin/conda config --set auto_activate_base false
 
 echo "Installing JupyterLab and Notebook via pip..."
@@ -53,7 +76,8 @@ $HOME/miniconda/bin/pip install jupyterlab notebook || echo "WARNING: Failed to 
 
 # --- Install Go Tools ---
 echo "Installing Go tools (gopls, kind via brew; GoNB, goimports via go install)..."
-brew install gopls kind # Already installed gopls? Brew will handle it.
+# Use verbose brew install here too for consistency
+brew install -v gopls kind
 go install github.com/janpfeifer/gonb@latest || echo "WARNING: Failed to install GoNB."
 go install golang.org/x/tools/cmd/goimports@latest || echo "WARNING: Failed to install goimports."
 # Run GoNB install only if the binary exists
@@ -76,6 +100,7 @@ sudo apt-get install -y --no-install-recommends \
 echo "Installing Playwright browsers..."
 # Use Playwright's installer directly (it's in PATH from global install)
 playwright install --with-deps chromium firefox webkit || echo "WARNING: playwright install failed."
+
 
 # --- Project Specific Setups ---
 # Tidy backend Go modules if 'backend' dir exists
@@ -100,8 +125,8 @@ fi
 
 # --- Install Podman ---
 # Note: Consider if Docker-in-Docker feature is sufficient, Podman might conflict or be redundant
-echo "Installing Podman via Homebrew..."
-brew install podman
+echo "Installing Podman via Homebrew (verbose)..."
+brew install -v podman
 # Initialize Podman (might require user interaction or specific setup)
 # podman machine init || echo "WARNING: Failed to initialize Podman machine."
 # podman machine start || echo "WARNING: Failed to start Podman machine."
@@ -109,6 +134,8 @@ echo "INFO: Podman installed, manual initialization might be needed (podman mach
 
 
 # --- Final Version Checks ---
+echo "==================================================================="
+echo "FINAL PATH BEFORE VERSION CHECKS: $PATH"
 echo "==================================================================="
 echo "INSTALLED COMPONENTS VERSIONS"
 echo "==================================================================="
@@ -118,48 +145,72 @@ echo "Node Version: $(node -v)"
 echo "pnpm Version: $(pnpm -v)"
 
 # Nx
-echo "Nx Version: $(nx --version 2>/dev/null || echo 'Not installed')"
+echo "Nx Version: $(nx --version 2>/dev/null || echo 'Nx: Not found')" # Added context
 
-# Angular CLI
-echo "Angular CLI Version: $(ng --version | grep 'Angular CLI' 2>/dev/null || echo 'Not installed')"
+# Angular CLI - Enhanced Check
+echo "--- Checking Angular CLI (ng) ---"
+if command -v ng &> /dev/null; then
+    echo "Raw 'ng --version' output:"
+    ng --version
+    echo "ng exit code: $?"
+    echo "Angular CLI Version: $(ng --version | grep 'Angular CLI:' 2>/dev/null || echo 'ng version output did not contain "Angular CLI:"')" # Note: Added colon based on typical output
+else
+    echo "ng command not found in final PATH check."
+    echo "Angular CLI Version: Not installed"
+fi
+echo "--- Finished checking ng ---"
+
 
 # Go and Go tools
 echo "Go Version: $(go version)"
-echo "GoNB Version: $(command -v gonb &> /dev/null && echo 'Installed' || echo 'Not installed')"
-echo "GoImports Version: $(command -v goimports &> /dev/null && echo 'Installed' || echo 'Not installed')"
-echo "GoPLS Version: $(gopls version 2>/dev/null || echo 'Not installed')" # gopls has version flag
-echo "Kind Version: $(kind version 2>/dev/null || echo 'Not installed')"
+echo "GoNB Version: $(command -v gonb &> /dev/null && echo 'Installed' || echo 'GoNB: Not installed')"
+echo "GoImports Version: $(command -v goimports &> /dev/null && echo 'Installed' || echo 'GoImports: Not installed')"
+echo "GoPLS Version: $(gopls version 2>/dev/null || echo 'GoPLS: Not installed')"
+echo "Kind Version: $(kind version 2>/dev/null || echo 'Kind: Not installed')"
+
 
 # Docker and Podman
-echo "Docker Version: $(docker --version 2>/dev/null || echo 'Not installed')"
-echo "Podman Version: $(podman --version 2>/dev/null || echo 'Not installed')"
+echo "Docker Version: $(docker --version 2>/dev/null || echo 'Docker: Not installed')"
+echo "Podman Version: $(podman --version 2>/dev/null || echo 'Podman: Not installed')"
 
-# Kubernetes tools
-echo "Kubectl Version: $(kubectl version --client --short 2>/dev/null || echo 'Not installed')" # Use --short
-echo "Helm Version: $(helm version --short 2>/dev/null || echo 'Not installed')"
-echo "Kustomize Version: $(kustomize version --short 2>/dev/null || echo 'Not installed')" # Should be installed now
+# Kubernetes tools - Enhanced Check
+echo "--- Checking Kubectl ---"
+if command -v kubectl &> /dev/null; then
+    echo "Raw 'kubectl version --client --short' output:"
+    kubectl version --client --short
+    echo "kubectl exit code: $?"
+    echo "Kubectl Version: $(kubectl version --client --short 2>/dev/null || echo 'kubectl version command failed or produced unexpected output')"
+else
+    echo "kubectl command not found in final PATH check."
+    echo "Kubectl Version: Not installed"
+fi
+echo "--- Finished checking kubectl ---"
+
+# Helm, Kustomize
+echo "Helm Version: $(helm version --short 2>/dev/null || echo 'Helm: Not installed')"
+echo "Kustomize Version: $(kustomize version --short 2>/dev/null || echo 'Kustomize: Not installed')"
 
 # Java
 echo "Java Version: $(java -version 2>&1 | head -n 1)"
-echo "Maven Version: $(mvn --version 2>/dev/null | head -n 1 || echo 'Not installed')"
-echo "Gradle Version: $(gradle --version | grep Gradle 2>/dev/null || echo 'Not installed')" # Should be installed now
+echo "Maven Version: $(mvn --version 2>/dev/null | head -n 1 || echo 'Maven: Not installed')"
+echo "Gradle Version: $(gradle --version | grep Gradle 2>/dev/null || echo 'Gradle: Not installed')"
 
 # Python and JupyterLab
-echo "Python Version: $($HOME/miniconda/bin/python --version 2>&1)" # Use conda python
-echo "Conda Version: $($HOME/miniconda/bin/conda --version 2>/dev/null || echo 'Not installed')"
-echo "JupyterLab Version: $($HOME/miniconda/bin/jupyter-lab --version 2>/dev/null || echo 'Not installed')"
-echo "Jupyter Notebook Version: $($HOME/miniconda/bin/jupyter-notebook --version 2>/dev/null || echo 'Not installed')"
+echo "Python Version: $($HOME/miniconda/bin/python --version 2>&1)"
+echo "Conda Version: $($HOME/miniconda/bin/conda --version 2>/dev/null || echo 'Conda: Not installed')"
+echo "JupyterLab Version: $($HOME/miniconda/bin/jupyter-lab --version 2>/dev/null || echo 'JupyterLab: Not installed')"
+echo "Jupyter Notebook Version: $($HOME/miniconda/bin/jupyter-notebook --version 2>/dev/null || echo 'Jupyter Notebook: Not installed')"
 
 # Playwright
-echo "Playwright Version: $(playwright --version 2>/dev/null || echo 'Not installed')"
+echo "Playwright Version: $(playwright --version 2>/dev/null || echo 'Playwright: Not installed')"
 
 # Terraform
-echo "Terraform Version: $(terraform --version | head -n 1 2>/dev/null || echo 'Not installed')"
+echo "Terraform Version: $(terraform --version | head -n 1 2>/dev/null || echo 'Terraform: Not installed')"
 
 # Rust
-echo "Rustc Version: $(rustc --version 2>/dev/null || echo 'Not installed')"
-echo "Cargo Version: $(cargo --version 2>/dev/null || echo 'Not installed')"
-echo "Rustup Version: $(rustup --version 2>/dev/null || echo 'Not installed')"
+echo "Rustc Version: $(rustc --version 2>/dev/null || echo 'Rustc: Not installed')"
+echo "Cargo Version: $(cargo --version 2>/dev/null || echo 'Cargo: Not installed')"
+echo "Rustup Version: $(rustup --version 2>/dev/null || echo 'Rustup: Not installed')"
 
 # Homebrew
 echo "Homebrew Version: $(brew --version | head -n 1)"
