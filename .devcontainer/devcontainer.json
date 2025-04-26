@@ -29,6 +29,10 @@
             "version": "24",
             "installMaven": true,
             "installGradle": true
+        },
+        // Homebrew: Package manager for macOS/Linux
+        "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {
+            "shallowClone": false
         }
     },
     // Forward ports for Angular dev server, Go backend, and Jupyter.
