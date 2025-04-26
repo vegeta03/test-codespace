@@ -49,9 +49,19 @@ go install golang.org/x/tools/gopls@latest
 go install sigs.k8s.io/kind@v0.23.0
 $(go env GOPATH)/bin/gonb --install
 
-# Install Playwright browsers
-echo "Installing Playwright browsers..."
-pnpm exec playwright install --with-deps
+# Install Playwright browsers - only if we have a package.json or we create one temporarily
+echo "Checking for Playwright setup..."
+if [ -f "package.json" ]; then
+    echo "Found package.json, installing Playwright browsers..."
+    # Install Playwright globally instead of using exec
+    pnpm install -g playwright
+    playwright install --with-deps
+else
+    echo "No package.json found. Installing Playwright globally..."
+    # Install Playwright globally and then run the install command
+    pnpm install -g playwright
+    playwright install --with-deps
+fi
 
 # Tidy backend Go modules if 'backend' dir exists
 if [ -d "backend" ]; then
