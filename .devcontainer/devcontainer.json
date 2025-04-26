@@ -1,5 +1,5 @@
 {
-    "name": "Angular (pnpm+Nx) + Go Gin + Podman + Docker + GoNB + Playwright + Java + Conda",
+    "name": "Angular (pnpm+Nx) + Go Gin + Podman + Docker + GoNB + Playwright + Java + Conda + Terraform + Rust",
     // Use a universal base image that includes many common tools and supports features well.
     "image": "mcr.microsoft.com/devcontainers/universal:2",
     "features": {
@@ -33,6 +33,12 @@
         // Homebrew: Package manager for macOS/Linux
         "ghcr.io/meaningful-ooo/devcontainer-features/homebrew:2": {
             "shallowClone": false
+        },
+        // Rust: Installs Rust toolchain (rustup, cargo, rustc)
+        "ghcr.io/devcontainers/features/rust:1": {
+            "version": "latest", // Or specify "stable", "nightly", etc.
+            "profile": "default", // Installs standard components like rustfmt, clippy
+            "installCargoWatch": true // Optional: useful tool for auto-recompiling on changes
         }
     },
     // Forward ports for Angular dev server, Go backend, and Jupyter.
@@ -49,7 +55,21 @@
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "bash",
                 // Point Python extension to Miniconda's Python environment
-                "python.defaultInterpreterPath": "${containerEnv:HOME}/miniconda/bin/python"
+                "python.defaultInterpreterPath": "${containerEnv:HOME}/miniconda/bin/python",
+                // Terraform formatting
+                "[terraform]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "hashicorp.terraform"
+                },
+                "[terraform-vars]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "hashicorp.terraform"
+                },
+                // Rust formatting
+                "[rust]": {
+                    "editor.formatOnSave": true,
+                    "editor.defaultFormatter": "rust-lang.rust-analyzer"
+                }
             },
             "extensions": [
                 // Essential Frontend
@@ -70,6 +90,11 @@
                 "ms-toolsai.jupyter", // Jupyter Notebook support
                 // Playwright Testing
                 "ms-playwright.playwright", // Playwright Test for VSCode
+                // Terraform
+                "hashicorp.terraform", // Official Terraform extension
+                "4ops.terraform", // Additional Terraform support
+                // Rust
+                "rust-lang.rust-analyzer", // Official Rust Language Server
                 // General Development
                 "eamodio.gitlens",
                 "redhat.vscode-yaml"

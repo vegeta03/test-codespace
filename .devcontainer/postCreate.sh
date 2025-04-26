@@ -10,11 +10,13 @@ echo "Starting post-creation setup..."
 export PATH="/home/linuxbrew/.linuxbrew/bin:$PATH"
 # Assuming Go feature ran and set GOPATH, ensure GOPATH/bin is in PATH
 export PATH=$(go env GOPATH)/bin:$PATH
+# Rust feature adds cargo bin to PATH automatically, but ensure ~/.cargo/bin is considered
+export PATH="$HOME/.cargo/bin:$PATH"
 
 # --- Install Core Tools (pnpm, Homebrew packages) ---
 echo "Updating Homebrew and installing basic tools..."
 brew update
-brew install wget curl kustomize gradle # Added kustomize and gradle
+brew install wget curl kustomize gradle terraform # Added terraform
 
 echo "Installing pnpm..."
 curl -fsSL https://get.pnpm.io/install.sh | bash -
@@ -150,6 +152,14 @@ echo "Jupyter Notebook Version: $($HOME/miniconda/bin/jupyter-notebook --version
 
 # Playwright
 echo "Playwright Version: $(playwright --version 2>/dev/null || echo 'Not installed')"
+
+# Terraform
+echo "Terraform Version: $(terraform --version | head -n 1 2>/dev/null || echo 'Not installed')"
+
+# Rust
+echo "Rustc Version: $(rustc --version 2>/dev/null || echo 'Not installed')"
+echo "Cargo Version: $(cargo --version 2>/dev/null || echo 'Not installed')"
+echo "Rustup Version: $(rustup --version 2>/dev/null || echo 'Not installed')"
 
 # Homebrew
 echo "Homebrew Version: $(brew --version | head -n 1)"
