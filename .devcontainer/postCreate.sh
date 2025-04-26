@@ -150,10 +150,17 @@ echo "Nx Version: $(nx --version 2>/dev/null || echo 'Nx: Not found')" # Added c
 # Angular CLI - Enhanced Check
 echo "--- Checking Angular CLI (ng) ---"
 if command -v ng &> /dev/null; then
-    echo "Raw 'ng --version' output:"
-    ng --version
-    echo "ng exit code: $?"
-    echo "Angular CLI Version: $(ng --version | grep 'Angular CLI:' 2>/dev/null || echo 'ng version output did not contain "Angular CLI:"')" # Note: Added colon based on typical output
+    echo "Attempting to get ng version..."
+    NG_VERSION_OUTPUT=$(ng --version 2>&1) # Capture stdout and stderr
+    NG_EXIT_CODE=$?
+    echo "Raw 'ng --version' output: $NG_VERSION_OUTPUT"
+    echo "ng exit code: $NG_EXIT_CODE"
+    if [ $NG_EXIT_CODE -eq 0 ]; then
+        # If command succeeded, use its output directly as the version
+        echo "Angular CLI Version: $NG_VERSION_OUTPUT"
+    else
+        echo "Angular CLI Version: Installed but 'ng --version' failed (Code: $NG_EXIT_CODE)"
+    fi
 else
     echo "ng command not found in final PATH check."
     echo "Angular CLI Version: Not installed"
@@ -176,10 +183,18 @@ echo "Podman Version: $(podman --version 2>/dev/null || echo 'Podman: Not instal
 # Kubernetes tools - Enhanced Check
 echo "--- Checking Kubectl ---"
 if command -v kubectl &> /dev/null; then
-    echo "Raw 'kubectl version --client --short' output:"
-    kubectl version --client --short
-    echo "kubectl exit code: $?"
-    echo "Kubectl Version: $(kubectl version --client --short 2>/dev/null || echo 'kubectl version command failed or produced unexpected output')"
+    echo "Attempting to get kubectl client version..."
+    # Use 'kubectl version --client' without '--short'
+    KUBECTL_VERSION_OUTPUT=$(kubectl version --client 2>&1)
+    KUBECTL_EXIT_CODE=$?
+    echo "Raw 'kubectl version --client' output: $KUBECTL_VERSION_OUTPUT"
+    echo "kubectl exit code: $KUBECTL_EXIT_CODE"
+    if [ $KUBECTL_EXIT_CODE -eq 0 ]; then
+        # If command succeeded, use its output
+        echo "Kubectl Version: $KUBECTL_VERSION_OUTPUT"
+    else
+        echo "Kubectl Version: Installed but 'kubectl version --client' failed (Code: $KUBECTL_EXIT_CODE)"
+    fi
 else
     echo "kubectl command not found in final PATH check."
     echo "Kubectl Version: Not installed"
