@@ -10,14 +10,18 @@ echo "Installing Miniconda..."
 sudo apt-get update && sudo apt-get install -y curl bzip2 libffi-dev libssl-dev --no-install-recommends
 # Ensure target directory is clear before installing
 sudo rm -rf /opt/conda 
-curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh \
-    && sudo bash /tmp/miniconda.sh -b -p /opt/conda \
-    && sudo rm /tmp/miniconda.sh \
-    && sudo /opt/conda/bin/conda init bash \
-    && sudo chown -R $(whoami) /opt/conda # Change ownership to current user \
-    # Add conda to PATH for current user's bashrc
-    && echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc \
-    && sudo /opt/conda/bin/conda config --system --set auto_activate_base false
+# Download and install Miniconda
+curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh
+sudo bash /tmp/miniconda.sh -b -p /opt/conda
+sudo rm /tmp/miniconda.sh
+# Initialize conda
+sudo /opt/conda/bin/conda init bash
+# Change ownership to current user
+sudo chown -R $(whoami) /opt/conda
+# Add conda to PATH for current user's bashrc
+echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc
+# Configure conda
+sudo /opt/conda/bin/conda config --system --set auto_activate_base false
 # Make conda command available for the rest of the script
 source /opt/conda/etc/profile.d/conda.sh
 
@@ -36,11 +40,11 @@ pnpm install -g nx
 
 # Install Go tools: GoNB kernel for Jupyter, Go Imports, GoPLS, and KinD
 echo "Installing Go tools (GoNB, goimports, gopls, kind)..."
-go install github.com/janpfeifer/gonb@latest && \
-    go install golang.org/x/tools/cmd/goimports@latest && \
-    go install golang.org/x/tools/gopls@latest && \
-    go install sigs.k8s.io/kind@v0.23.0 && \
-    $(go env GOPATH)/bin/gonb --install
+go install github.com/janpfeifer/gonb@latest
+go install golang.org/x/tools/cmd/goimports@latest
+go install golang.org/x/tools/gopls@latest
+go install sigs.k8s.io/kind@v0.23.0
+$(go env GOPATH)/bin/gonb --install
 
 # Install Playwright browsers
 echo "Installing Playwright browsers..."
