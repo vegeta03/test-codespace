@@ -95,8 +95,8 @@ sudo apt-get install -y --no-install-recommends \
     libvpx6 \
     libevent-2.1-7
 
-# Use Playwright's installer with system dependencies via pnpm
-pnpm exec playwright install --with-deps chromium firefox webkit
+# Use Playwright's installer with system dependencies directly (it's in PATH)
+playwright install --with-deps chromium firefox webkit
 
 # Tidy backend Go modules if 'backend' dir exists
 if [ -d "backend" ]; then
@@ -152,10 +152,10 @@ echo "NPM Version: $(pnpm -v)"
 
 # pnpm and Nx
 echo "PNPM Version: $(pnpm -v)"
-echo "Nx Version: $(pnpm exec nx --version 2>/dev/null || echo 'Not installed')"
+echo "Nx Version: $(nx --version 2>/dev/null || echo 'Not installed')"
 
 # Angular CLI
-echo "Angular CLI Version: $(pnpm exec ng version --version 2>/dev/null || echo 'Not installed')"
+echo "Angular CLI Version: $(ng version --version 2>/dev/null || echo 'Not installed')"
 
 # Go and Go tools
 echo "Go Version: $(go version)"
@@ -184,7 +184,7 @@ echo "Conda Version: $($HOME/miniconda/bin/conda --version 2>/dev/null || echo '
 echo "JupyterLab Version: $($HOME/miniconda/bin/jupyter-lab --version 2>/dev/null || echo 'Not installed')"
 
 # Playwright
-echo "Playwright Version: $(pnpm exec playwright --version 2>/dev/null || echo 'Not installed')"
+echo "Playwright Version: $(playwright --version 2>/dev/null || echo 'Not installed')"
 
 # Homebrew
 echo "Homebrew Version: $(brew --version | head -n 1)"
