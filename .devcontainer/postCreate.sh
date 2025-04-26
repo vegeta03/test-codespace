@@ -13,11 +13,12 @@ sudo npm install -g pnpm
 echo "Installing Nx..."
 sudo pnpm install -g nx
 
-# Install Go tools: GoNB kernel for Jupyter
-echo "Installing GoNB kernel..."
+# Install Go tools: GoNB kernel for Jupyter, Go Imports, GoPLS, and KinD
+echo "Installing Go tools (GoNB, goimports, gopls, kind)..."
 go install github.com/janpfeifer/gonb@latest && \
     go install golang.org/x/tools/cmd/goimports@latest && \
     go install golang.org/x/tools/gopls@latest && \
+    go install sigs.k8s.io/kind@v0.23.0 && \
     $(go env GOPATH)/bin/gonb --install
 
 # Install Playwright browsers
