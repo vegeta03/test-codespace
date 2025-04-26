@@ -13,16 +13,18 @@ echo "Updating Homebrew..."
 brew update
 brew install wget curl
 
-# Install Miniconda via Homebrew (instead of direct download)
-echo "Installing Miniconda via Homebrew..."
-brew install --cask miniconda
+# Install Miniconda directly (not via Homebrew cask which is macOS-only)
+echo "Installing Miniconda directly..."
+wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -O /tmp/miniconda.sh
+bash /tmp/miniconda.sh -b -p $HOME/miniconda
+rm /tmp/miniconda.sh
 
 # Initialize conda
 echo "Initializing conda..."
-eval "$(/home/linuxbrew/.linuxbrew/Caskroom/miniconda/base/bin/conda shell.bash hook)"
-conda init bash
+eval "$($HOME/miniconda/bin/conda shell.bash hook)"
+$HOME/miniconda/bin/conda init bash
 # Configure conda
-conda config --set auto_activate_base false
+$HOME/miniconda/bin/conda config --set auto_activate_base false
 
 # Install pnpm globally using npm
 echo "Installing pnpm..."
@@ -55,11 +57,14 @@ go install github.com/janpfeifer/gonb@latest
 go install golang.org/x/tools/cmd/goimports@latest
 $(go env GOPATH)/bin/gonb --install
 
-# Install Playwright - globally via pnpm for now, but browsers via Homebrew
+# Install Playwright - globally via pnpm
 echo "Installing Playwright..."
 pnpm install -g playwright
-# Install browsers via Homebrew for better performance
-brew install --cask chromium firefox
+
+# Install browsers for Playwright - use apt instead of Homebrew casks which are macOS-only
+echo "Installing Playwright browsers using apt..."
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends chromium firefox
 
 # Still need to run Playwright install for WebKit and other dependencies
 echo "Installing remaining Playwright dependencies..."
@@ -95,9 +100,9 @@ pnpm install -g @angular/cli nx
 # Configure pnpm store location (good practice for containers)
 # pnpm config set store-dir ~/.local/share/pnpm/store
 
-# Install JupyterLab using Homebrew (instead of Conda)
-echo "Installing JupyterLab via Homebrew..."
-brew install jupyterlab
+# Install JupyterLab via pip (more reliable cross-platform than Homebrew for Python packages)
+echo "Installing JupyterLab via pip..."
+$HOME/miniconda/bin/pip install jupyterlab
 
 # Install frontend dependencies if 'frontend' dir exists
 if [ -d "frontend" ]; then
@@ -147,8 +152,8 @@ echo "Gradle Version: $(gradle --version 2>/dev/null | head -n 3 | tail -n 1 || 
 
 # Python and JupyterLab
 echo "Python Version: $(python --version 2>&1)"
-echo "Conda Version: $(conda --version 2>/dev/null || echo 'Not installed')"
-echo "JupyterLab Version: $(jupyter-lab --version 2>/dev/null || echo 'Not installed')"
+echo "Conda Version: $($HOME/miniconda/bin/conda --version 2>/dev/null || echo 'Not installed')"
+echo "JupyterLab Version: $($HOME/miniconda/bin/jupyter-lab --version 2>/dev/null || echo 'Not installed')"
 
 # Playwright
 echo "Playwright Version: $(npx playwright --version 2>/dev/null || echo 'Not installed')"

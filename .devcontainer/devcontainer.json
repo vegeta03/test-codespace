@@ -48,8 +48,8 @@
         "vscode": {
             "settings": {
                 "terminal.integrated.defaultProfile.linux": "bash",
-                // Point Python extension to Conda's Python environment
-                "python.defaultInterpreterPath": "/opt/conda/bin/python"
+                // Point Python extension to Miniconda's Python environment
+                "python.defaultInterpreterPath": "${containerEnv:HOME}/miniconda/bin/python"
             },
             "extensions": [
                 // Essential Frontend
