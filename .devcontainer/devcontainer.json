@@ -17,10 +17,6 @@
             "version": "latest",
             "moby": true
         },
-        // Podman: Installs Podman CLI.
-        "ghcr.io/devcontainers/features/podman:1": {
-            "version": "latest"
-        },
         // KinD (Kubernetes in Docker): Installs KinD CLI for local Kubernetes clusters.
         "ghcr.io/devcontainers/features/kind:1": {
             "version": "latest"
