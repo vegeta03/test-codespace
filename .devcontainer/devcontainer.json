@@ -18,29 +18,30 @@
             "moby": true
         },
         // Podman: Installs Podman CLI.
-        // "ghcr.io/devcontainers/features/podman:1": {
-        //     "version": "latest"
-        // },
+        "ghcr.io/devcontainers/features/podman:1": {
+            "version": "latest"
+        },
         // KinD (Kubernetes in Docker): Installs KinD CLI for local Kubernetes clusters.
-        // "ghcr.io/devcontainers/features/kind:1": {
-        //     "version": "latest"
-        // },
+        "ghcr.io/devcontainers/features/kind:1": {
+            "version": "latest"
+        },
         // Kubectl, Helm, Kustomize: Installs essential Kubernetes tooling.
         "ghcr.io/devcontainers/features/kubectl-helm-minikube:1": {
             "version": "latest",
             "helm": "latest",
-            "kustomize": "latest"
+            "kustomize": "latest",
+            "installMinikube": false
         },
         // Java: Installs OpenJDK 24.
         "ghcr.io/devcontainers/features/java:1": {
             "version": "24",
-            "installMaven": "true",
-            "installGradle": "true"
-        }
+            "installMaven": true,
+            "installGradle": true
+        },
         // Miniconda: Installs Miniconda for Python/Jupyter environment management.
-        // "ghcr.io/devcontainers/features/miniconda:1": {
-        //     "version": "latest"
-        // }
+        "ghcr.io/devcontainers/features/miniconda:1": {
+            "version": "latest"
+        }
     },
     // Forward ports for Angular dev server, Go backend, and Jupyter.
     "forwardPorts": [
