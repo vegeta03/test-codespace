@@ -164,7 +164,7 @@ echo "pnpm Version: $(pnpm -v)"
 echo "Nx Version: $(nx --version 2>/dev/null || echo 'Nx: Not found')"
 
 # Angular CLI
-echo "Angular CLI Version: $(ng --version)"
+echo "Angular CLI Version: $(ng --version 2>/dev/null || echo 'Angular CLI: Not installed')"
 
 # Go and Go tools
 echo "Go Version: $(go version)"
@@ -179,7 +179,7 @@ echo "Docker Version: $(docker --version 2>/dev/null || echo 'Docker: Not instal
 echo "Podman Version: $(podman --version 2>/dev/null || echo 'Podman: Not installed')"
 
 # Kubernetes tools
-echo "Kubectl Version: $(kubectl version --client)"
+echo "Kubectl Version: $(kubectl version --client 2>/dev/null || echo 'Kubectl: Not installed')"
 
 # Helm, Kustomize
 echo "Helm Version: $(helm version --short 2>/dev/null || echo 'Helm: Not installed')"
@@ -200,7 +200,7 @@ echo "Jupyter Notebook Version: $($HOME/miniconda/bin/jupyter-notebook --version
 echo "Playwright Version: $(playwright --version 2>/dev/null || echo 'Playwright: Not installed')"
 
 # Terraform
-echo "Terraform Version: $(terraform version)"
+echo "Terraform Version: $(terraform version 2>/dev/null || echo 'Terraform: Not installed')"
 
 # Rust
 echo "Rustc Version: $(rustc --version 2>/dev/null || echo 'Rustc: Not installed')"
