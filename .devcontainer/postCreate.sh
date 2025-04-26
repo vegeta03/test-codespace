@@ -92,7 +92,7 @@ sudo apt-get install -y --no-install-recommends \
     fonts-noto-color-emoji \
     ttf-ubuntu-font-family \
     fonts-liberation \
-    libvpx7 \
+    libvpx6 \
     libevent-2.1-7
 
 # Use Playwright's installer with system dependencies via pnpm
