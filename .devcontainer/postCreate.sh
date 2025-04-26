@@ -31,8 +31,11 @@ sudo npm install -g pnpm
 # Setup pnpm environment (adds PNPM_HOME to ~/.bashrc and PATH)
 echo "Setting up pnpm environment..."
 pnpm setup
-# Source .bashrc to make PNPM_HOME and updated PATH available now
-source ~/.bashrc
+# Explicitly set PNPM_HOME and update PATH for the current session
+export PNPM_HOME="$HOME/.local/share/pnpm"
+export PATH="$PNPM_HOME:$PATH"
+echo "PNPM_HOME is set to: $PNPM_HOME"
+echo "Updated PATH: $PATH"
 
 # Install Nx globally using pnpm (no sudo)
 echo "Installing Nx..."
