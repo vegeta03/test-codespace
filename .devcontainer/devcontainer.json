@@ -49,7 +49,7 @@
         8888 // Default Jupyter port [1]
     ],
     // Updated commands to run after container creation.
-    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y --no-install-recommends && npm install -g pnpm && pnpm setup && pnpm install -g @angular/cli nx && pnpm config set store-dir ~/.local/share/pnpm/store && conda update -n base -c defaults conda && conda install -y jupyterlab && go install golang.org/x/tools/cmd/goimports@latest && go install golang.org/x/tools/gopls@latest && go install github.com/janpfeifer/gonb@latest && gonb --install && npx playwright install --with-deps && if [ -d \\\"frontend\\\" ]; then cd frontend && pnpm install; cd ..; fi && if [ -d \\\"backend\\\" ]; then cd backend && go mod tidy; cd ..; fi && echo 'postCreateCommand finished.'",
+    "postCreateCommand": "sudo apt-get update && sudo apt-get install -y --no-install-recommends && npm install -g pnpm && pnpm install -g @angular/cli nx && pnpm config set store-dir ~/.local/share/pnpm/store && conda update -n base -c defaults conda && conda install -y jupyterlab && go install golang.org/x/tools/cmd/goimports@latest && go install golang.org/x/tools/gopls@latest && go install github.com/janpfeifer/gonb@latest && gonb --install && npx playwright install --with-deps && if [ -d \\\"frontend\\\" ]; then cd frontend && pnpm install; cd ..; fi && if [ -d \\\"backend\\\" ]; then cd backend && go mod tidy; cd ..; fi && echo 'postCreateCommand finished.'",
     // Configure VS Code settings and extensions within the codespace.
     "customizations": {
         "vscode": {
