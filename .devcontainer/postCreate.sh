@@ -26,12 +26,13 @@ $HOME/miniconda/bin/conda init bash
 # Configure conda
 $HOME/miniconda/bin/conda config --set auto_activate_base false
 
-# Install pnpm globally using npm
+# Install pnpm using the official install script instead of npm
 echo "Installing pnpm..."
-sudo npm install -g pnpm
+curl -fsSL https://get.pnpm.io/install.sh | bash -
 # Setup pnpm environment (adds PNPM_HOME to ~/.bashrc and PATH)
 echo "Setting up pnpm environment..."
-pnpm setup
+# Source the bashrc to get pnpm in the current session
+source ~/.bashrc
 # Explicitly set PNPM_HOME and update PATH for the current session
 export PNPM_HOME="$HOME/.local/share/pnpm"
 export PATH="$PNPM_HOME:$PATH"
@@ -61,14 +62,41 @@ $(go env GOPATH)/bin/gonb --install
 echo "Installing Playwright..."
 pnpm install -g playwright
 
-# Install browsers for Playwright - use apt instead of Homebrew casks which are macOS-only
-echo "Installing Playwright browsers using apt..."
+# Install Playwright browsers using Playwright's own mechanism
+echo "Installing Playwright browsers..."
+# Install required dependencies first
 sudo apt-get update
-sudo apt-get install -y --no-install-recommends chromium firefox
+sudo apt-get install -y --no-install-recommends \
+    libasound2 \
+    libatk-bridge2.0-0 \
+    libatk1.0-0 \
+    libatspi2.0-0 \
+    libcairo2 \
+    libcups2 \
+    libdbus-1-3 \
+    libdrm2 \
+    libgbm1 \
+    libglib2.0-0 \
+    libnspr4 \
+    libnss3 \
+    libpango-1.0-0 \
+    libx11-6 \
+    libxcb1 \
+    libxcomposite1 \
+    libxdamage1 \
+    libxext6 \
+    libxfixes3 \
+    libxkbcommon0 \
+    libxrandr2 \
+    xvfb \
+    fonts-noto-color-emoji \
+    ttf-ubuntu-font-family \
+    fonts-liberation \
+    libvpx7 \
+    libevent-2.1-7
 
-# Still need to run Playwright install for WebKit and other dependencies
-echo "Installing remaining Playwright dependencies..."
-playwright install --with-deps webkit
+# Use Playwright's installer with system dependencies via pnpm
+pnpm exec playwright install --with-deps chromium firefox webkit
 
 # Tidy backend Go modules if 'backend' dir exists
 if [ -d "backend" ]; then
@@ -120,14 +148,14 @@ echo "==================================================================="
 
 # Node and npm
 echo "Node Version: $(node -v)"
-echo "NPM Version: $(npm -v)"
+echo "NPM Version: $(pnpm -v)"
 
 # pnpm and Nx
 echo "PNPM Version: $(pnpm -v)"
-echo "Nx Version: $(nx --version 2>/dev/null || echo 'Not installed')"
+echo "Nx Version: $(pnpm exec nx --version 2>/dev/null || echo 'Not installed')"
 
 # Angular CLI
-echo "Angular CLI Version: $(ng version --version 2>/dev/null || echo 'Not installed')"
+echo "Angular CLI Version: $(pnpm exec ng version --version 2>/dev/null || echo 'Not installed')"
 
 # Go and Go tools
 echo "Go Version: $(go version)"
@@ -156,7 +184,7 @@ echo "Conda Version: $($HOME/miniconda/bin/conda --version 2>/dev/null || echo '
 echo "JupyterLab Version: $($HOME/miniconda/bin/jupyter-lab --version 2>/dev/null || echo 'Not installed')"
 
 # Playwright
-echo "Playwright Version: $(npx playwright --version 2>/dev/null || echo 'Not installed')"
+echo "Playwright Version: $(pnpm exec playwright --version 2>/dev/null || echo 'Not installed')"
 
 # Homebrew
 echo "Homebrew Version: $(brew --version | head -n 1)"
