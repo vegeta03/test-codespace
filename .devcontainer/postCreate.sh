@@ -13,11 +13,11 @@ export PATH=$(go env GOPATH)/bin:$PATH
 # Rust feature adds cargo bin to PATH automatically, but ensure ~/.cargo/bin is considered
 export PATH="$HOME/.cargo/bin:$PATH"
 
-# --- Install Core Tools (pnpm, Homebrew packages) ---
-echo "Updating Homebrew and installing basic tools (verbose)..."
+# --- Install Core Tools (Homebrew) ---
+echo "Updating Homebrew and installing basic tools (wget, curl, kustomize, gradle, kubectl - verbose)..."
 brew update
-# Added -v for verbose install
-brew install -v wget curl kustomize gradle terraform kubectl
+# Removed terraform - will install via APT
+brew install -v wget curl kustomize gradle kubectl
 
 echo "Verifying kubectl installation..."
 # Use command -v and exit if not found
@@ -28,6 +28,26 @@ if ! command -v kubectl &> /dev/null; then
 fi
 echo "kubectl found at: $(command -v kubectl)"
 
+# --- Install Terraform via APT ---
+echo "Ensuring prerequisites for Terraform APT repo..."
+sudo apt-get update && sudo apt-get install -y gnupg software-properties-common curl
+echo "Adding HashiCorp GPG key..."
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+echo "Adding HashiCorp APT repository..."
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+echo "Installing Terraform via apt..."
+sudo apt-get update && sudo apt-get install -y terraform
+
+echo "Verifying Terraform installation..."
+if ! command -v terraform &> /dev/null; then
+    echo "ERROR: terraform command not found in PATH immediately after apt install."
+    echo "PATH was: $PATH"
+    exit 1
+fi
+echo "terraform found at: $(command -v terraform)"
+
+
+# --- Install pnpm --- 
 echo "Installing pnpm..."
 curl -fsSL https://get.pnpm.io/install.sh | bash -
 # Explicitly set PNPM_HOME and update PATH for the current session
@@ -123,17 +143,13 @@ if [ -d "frontend" ]; then
     cd ..
 fi
 
-# --- Install Podman ---
-# Note: Consider if Docker-in-Docker feature is sufficient, Podman might conflict or be redundant
+# --- Install Podman --- 
 echo "Installing Podman via Homebrew (verbose)..."
 brew install -v podman
-# Initialize Podman (might require user interaction or specific setup)
-# podman machine init || echo "WARNING: Failed to initialize Podman machine."
-# podman machine start || echo "WARNING: Failed to start Podman machine."
 echo "INFO: Podman installed, manual initialization might be needed (podman machine init/start)."
 
 
-# --- Final Version Checks ---
+# --- Final Version Checks --- 
 echo "==================================================================="
 echo "FINAL PATH BEFORE VERSION CHECKS: $PATH"
 echo "==================================================================="
@@ -145,7 +161,7 @@ echo "Node Version: $(node -v)"
 echo "pnpm Version: $(pnpm -v)"
 
 # Nx
-echo "Nx Version: $(nx --version 2>/dev/null || echo 'Nx: Not found')" # Added context
+echo "Nx Version: $(nx --version 2>/dev/null || echo 'Nx: Not found')"
 
 # Angular CLI - Enhanced Check
 echo "--- Checking Angular CLI (ng) ---"
@@ -219,8 +235,27 @@ echo "Jupyter Notebook Version: $($HOME/miniconda/bin/jupyter-notebook --version
 # Playwright
 echo "Playwright Version: $(playwright --version 2>/dev/null || echo 'Playwright: Not installed')"
 
-# Terraform
-echo "Terraform Version: $(terraform --version | head -n 1 2>/dev/null || echo 'Terraform: Not installed')"
+# Terraform - Check uses standard version command
+echo "--- Checking Terraform ---"
+if command -v terraform &> /dev/null; then
+    echo "Attempting to get terraform version..."
+    # Use 'terraform version' or 'terraform --version' which usually includes the version on the first line
+    TERRAFORM_VERSION_OUTPUT=$(terraform version 2>&1 | head -n 1)
+    TERRAFORM_EXIT_CODE=$?
+    echo "Raw 'terraform version' output (first line): $TERRAFORM_VERSION_OUTPUT"
+    echo "terraform exit code: $TERRAFORM_EXIT_CODE"
+    if [ $TERRAFORM_EXIT_CODE -eq 0 ]; then
+        # If command succeeded, use its output
+        echo "Terraform Version: $TERRAFORM_VERSION_OUTPUT"
+    else
+        echo "Terraform Version: Installed but 'terraform version' failed (Code: $TERRAFORM_EXIT_CODE)"
+    fi
+else
+    echo "terraform command not found in final PATH check."
+    echo "Terraform Version: Not installed"
+fi
+echo "--- Finished checking Terraform ---"
+
 
 # Rust
 echo "Rustc Version: $(rustc --version 2>/dev/null || echo 'Rustc: Not installed')"
