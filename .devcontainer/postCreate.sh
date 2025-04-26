@@ -163,26 +163,8 @@ echo "pnpm Version: $(pnpm -v)"
 # Nx
 echo "Nx Version: $(nx --version 2>/dev/null || echo 'Nx: Not found')"
 
-# Angular CLI - Enhanced Check
-echo "--- Checking Angular CLI (ng) ---"
-if command -v ng &> /dev/null; then
-    echo "Attempting to get ng version..."
-    NG_VERSION_OUTPUT=$(ng --version 2>&1) # Capture stdout and stderr
-    NG_EXIT_CODE=$?
-    echo "Raw 'ng --version' output: $NG_VERSION_OUTPUT"
-    echo "ng exit code: $NG_EXIT_CODE"
-    if [ $NG_EXIT_CODE -eq 0 ]; then
-        # If command succeeded, use its output directly as the version
-        echo "Angular CLI Version: $NG_VERSION_OUTPUT"
-    else
-        echo "Angular CLI Version: Installed but 'ng --version' failed (Code: $NG_EXIT_CODE)"
-    fi
-else
-    echo "ng command not found in final PATH check."
-    echo "Angular CLI Version: Not installed"
-fi
-echo "--- Finished checking ng ---"
-
+# Angular CLI
+echo "Angular CLI Version: $(ng --version)"
 
 # Go and Go tools
 echo "Go Version: $(go version)"
@@ -196,26 +178,8 @@ echo "Kind Version: $(kind version 2>/dev/null || echo 'Kind: Not installed')"
 echo "Docker Version: $(docker --version 2>/dev/null || echo 'Docker: Not installed')"
 echo "Podman Version: $(podman --version 2>/dev/null || echo 'Podman: Not installed')"
 
-# Kubernetes tools - Enhanced Check
-echo "--- Checking Kubectl ---"
-if command -v kubectl &> /dev/null; then
-    echo "Attempting to get kubectl client version..."
-    # Use 'kubectl version --client' without '--short'
-    KUBECTL_VERSION_OUTPUT=$(kubectl version --client 2>&1)
-    KUBECTL_EXIT_CODE=$?
-    echo "Raw 'kubectl version --client' output: $KUBECTL_VERSION_OUTPUT"
-    echo "kubectl exit code: $KUBECTL_EXIT_CODE"
-    if [ $KUBECTL_EXIT_CODE -eq 0 ]; then
-        # If command succeeded, use its output
-        echo "Kubectl Version: $KUBECTL_VERSION_OUTPUT"
-    else
-        echo "Kubectl Version: Installed but 'kubectl version --client' failed (Code: $KUBECTL_EXIT_CODE)"
-    fi
-else
-    echo "kubectl command not found in final PATH check."
-    echo "Kubectl Version: Not installed"
-fi
-echo "--- Finished checking kubectl ---"
+# Kubernetes tools
+echo "Kubectl Version: $(kubectl version --client)"
 
 # Helm, Kustomize
 echo "Helm Version: $(helm version --short 2>/dev/null || echo 'Helm: Not installed')"
@@ -235,27 +199,8 @@ echo "Jupyter Notebook Version: $($HOME/miniconda/bin/jupyter-notebook --version
 # Playwright
 echo "Playwright Version: $(playwright --version 2>/dev/null || echo 'Playwright: Not installed')"
 
-# Terraform - Check uses standard version command
-echo "--- Checking Terraform ---"
-if command -v terraform &> /dev/null; then
-    echo "Attempting to get terraform version..."
-    # Use 'terraform version' or 'terraform --version' which usually includes the version on the first line
-    TERRAFORM_VERSION_OUTPUT=$(terraform version 2>&1 | head -n 1)
-    TERRAFORM_EXIT_CODE=$?
-    echo "Raw 'terraform version' output (first line): $TERRAFORM_VERSION_OUTPUT"
-    echo "terraform exit code: $TERRAFORM_EXIT_CODE"
-    if [ $TERRAFORM_EXIT_CODE -eq 0 ]; then
-        # If command succeeded, use its output
-        echo "Terraform Version: $TERRAFORM_VERSION_OUTPUT"
-    else
-        echo "Terraform Version: Installed but 'terraform version' failed (Code: $TERRAFORM_EXIT_CODE)"
-    fi
-else
-    echo "terraform command not found in final PATH check."
-    echo "Terraform Version: Not installed"
-fi
-echo "--- Finished checking Terraform ---"
-
+# Terraform
+echo "Terraform Version: $(terraform version)"
 
 # Rust
 echo "Rustc Version: $(rustc --version 2>/dev/null || echo 'Rustc: Not installed')"
