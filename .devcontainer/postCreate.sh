@@ -14,7 +14,7 @@ curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
     && sudo bash /tmp/miniconda.sh -b -p /opt/conda \
     && sudo rm /tmp/miniconda.sh \
     && sudo /opt/conda/bin/conda init bash \
-    && sudo chown -R $(whoami) /opt/conda # Change ownership to current user
+    && sudo chown -R $(whoami) /opt/conda # Change ownership to current user \
     # Add conda to PATH for current user's bashrc
     && echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc \
     && sudo /opt/conda/bin/conda config --system --set auto_activate_base false
