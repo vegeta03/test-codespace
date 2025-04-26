@@ -37,6 +37,11 @@ export PATH="$PNPM_HOME:$PATH"
 echo "PNPM_HOME is set to: $PNPM_HOME"
 echo "Updated PATH: $PATH"
 
+# Configure pnpm to allow building all dependencies (avoids interactive approval)
+# This was added in pnpm v10.9.0 and is useful for CI/CD environments
+echo "Configuring pnpm to allow all builds..."
+pnpm config set dangerouslyAllowAllBuilds true
+
 # Install Nx globally using pnpm (no sudo)
 echo "Installing Nx..."
 pnpm install -g nx
@@ -76,9 +81,15 @@ if [ -d "backend" ]; then
     cd ..
 fi
 
-# Update apt cache and install Podman
+# Install Podman via the correct repository
 echo "Installing Podman..."
-sudo apt-get update && sudo apt-get install -y podman
+# Add Podman repository for Ubuntu 20.04 (Focal)
+. /etc/os-release
+echo "deb https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/ /" | sudo tee /etc/apt/sources.list.d/devel:kubic:libcontainers:stable.list
+curl -L "https://download.opensuse.org/repositories/devel:/kubic:/libcontainers:/stable/xUbuntu_${VERSION_ID}/Release.key" | sudo apt-key add -
+sudo apt-get update
+# Install Podman
+sudo apt-get install -y podman || echo "WARNING: Failed to install Podman. Continuing anyway..."
 
 echo "Post-creation setup complete."
 
