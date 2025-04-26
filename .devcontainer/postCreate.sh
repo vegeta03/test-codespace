@@ -5,6 +5,18 @@ set -e # Exit immediately if a command exits with a non-zero status.
 
 echo "Starting post-creation setup..."
 
+# Install Miniconda
+echo "Installing Miniconda..."
+sudo apt-get update && sudo apt-get install -y curl bzip2 libffi-dev libssl-dev --no-install-recommends
+curl -fsSL https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh -o /tmp/miniconda.sh \
+    && bash /tmp/miniconda.sh -b -p /opt/conda \
+    && rm /tmp/miniconda.sh \
+    && /opt/conda/bin/conda init bash \
+    && echo ". /opt/conda/etc/profile.d/conda.sh" >> ~/.bashrc \
+    && conda config --set auto_activate_base false
+# Make conda command available for the rest of the script
+source /opt/conda/etc/profile.d/conda.sh
+
 # Update package lists and install pnpm globally using npm (comes with Node feature)
 echo "Installing pnpm..."
 sudo npm install -g pnpm
