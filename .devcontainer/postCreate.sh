@@ -16,7 +16,7 @@ export PATH="$HOME/.cargo/bin:$PATH"
 # --- Install Core Tools (pnpm, Homebrew packages) ---
 echo "Updating Homebrew and installing basic tools..."
 brew update
-brew install wget curl kustomize gradle terraform # Added terraform
+brew install wget curl kustomize gradle terraform kubectl # Added kubectl
 
 echo "Installing pnpm..."
 curl -fsSL https://get.pnpm.io/install.sh | bash -
@@ -34,7 +34,7 @@ pnpm config set dangerouslyAllowAllBuilds true
 # --- Install Global Node.js Packages ---
 echo "Installing global pnpm packages (@angular/cli, nx, playwright)..."
 # Moved this earlier and added playwright here
-pnpm install -g @angular/cli nx playwright || echo "WARNING: Failed to install global pnpm packages."
+pnpm install -g @angular/cli nx playwright
 
 # --- Install Miniconda & Jupyter ---
 echo "Installing Miniconda directly..."

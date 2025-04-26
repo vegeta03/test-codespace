@@ -1,11 +1,14 @@
 # test-codespace
 
+```plaintext
 ===================================================================
 INSTALLED COMPONENTS VERSIONS
 ===================================================================
 Node Version: v22.15.0
 pnpm Version: 10.9.0
-Nx Version: Global: v20.8.1
+Nx Version: Nx Version:
+- Local: Not found
+- Global: v20.8.1
 Angular CLI Version: Not installed
 Go Version: go version go1.24.2 linux/amd64
 GoNB Version: Installed
@@ -26,5 +29,10 @@ Conda Version: conda 25.1.1
 JupyterLab Version: 4.4.1
 Jupyter Notebook Version: 7.4.1
 Playwright Version: Version 1.52.0
+Terraform Version: Terraform v1.5.7
+Rustc Version: rustc 1.86.0 (05f9846f8 2025-03-31)
+Cargo Version: cargo 1.86.0 (adf9b6ad1 2025-02-28)
+Rustup Version: rustup 1.28.1 (f9edccde0 2025-03-05)
 Homebrew Version: Homebrew 4.4.32-67-g0e7f19f
 ===================================================================
+```
