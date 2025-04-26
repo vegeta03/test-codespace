@@ -104,7 +104,9 @@ pnpm install -g @angular/cli nx
 # Install JupyterLab using Conda (Assuming Conda is available from features)
 if command -v conda &> /dev/null
 then
-    conda update -n base -c defaults conda
+    echo "Updating conda packages (non-interactive mode)..."
+    conda update -y -n base -c defaults conda
+    echo "Installing JupyterLab (non-interactive mode)..."
     conda install -y jupyterlab
 else
     echo "WARNING: conda command not found. Skipping JupyterLab installation."
